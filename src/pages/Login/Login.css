@@ -1,0 +1,8 @@
+*{
+  /* background: rgb(76, 76, 76); */
+}
+.form_container{
+  margin: 50px;
+  border: 2px solid goldenrod;
+  padding: 50px;
+}
