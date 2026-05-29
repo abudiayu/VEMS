@@ -15,8 +15,14 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/login' element = {<Login/>}/>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+        {/* FIRST PAGE */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
+        {/* LOGIN PAGE */}
+        <Route path="/login" element={<Login />} />
+
+        {/* DASHBOARD LAYOUT */}
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/birth" element={<Birth />} />
@@ -27,7 +33,10 @@ export default function App() {
           <Route path="/users" element={<Users />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+        {/* UNKNOWN PAGE */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+
       </Routes>
     </BrowserRouter>
   );

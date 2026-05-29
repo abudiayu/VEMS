@@ -11,15 +11,73 @@ import './Birth.css';
 export default function Birth() {
   usePageTitle('Birth Records');
 
+  const mockData = {
+    records: [
+      {
+        id: 1,
+        registration_no: 'BR-2026-001',
+        child_name: 'Abel Mohammed',
+        date_of_birth: '2026-05-10',
+        father_name: 'Mohammed Ali',
+        mother_name: 'Selamawit Bekele',
+        place_of_birth: 'Dessie Referral Hospital',
+        status: 'registered',
+      },
+      {
+        id: 2,
+        registration_no: 'BR-2026-002',
+        child_name: 'Mahi Tesfaye',
+        date_of_birth: '2026-05-12',
+        father_name: 'Tesfaye Alemu',
+        mother_name: 'Hanan Yusuf',
+        place_of_birth: 'Wollo Hospital',
+        status: 'pending',
+      },
+      {
+        id: 3,
+        registration_no: 'BR-2026-003',
+        child_name: 'Eden Abebe',
+        date_of_birth: '2026-05-15',
+        father_name: 'Abebe Kebede',
+        mother_name: 'Marta Haile',
+        place_of_birth: 'Kombolcha Health Center',
+        status: 'registered',
+      },
+      {
+        id: 4,
+        registration_no: 'BR-2026-004',
+        child_name: 'Yasin Ahmed',
+        date_of_birth: '2026-05-18',
+        father_name: 'Ahmed Nur',
+        mother_name: 'Sofia Ali',
+        place_of_birth: 'Boru Meda Hospital',
+        status: 'registered',
+      },
+      {
+        id: 5,
+        registration_no: 'BR-2026-005',
+        child_name: 'Rahel Getachew',
+        date_of_birth: '2026-05-20',
+        father_name: 'Getachew Tadesse',
+        mother_name: 'Betelhem Desta',
+        place_of_birth: 'Dessie',
+        status: 'pending',
+      },
+    ],
+  };
+
   const { data, loading, refetch } = useFetch(() => birthService.getAll());
-  const [showForm, setShowForm]   = useState(false);
+
+  const [showForm, setShowForm] = useState(false);
   const [editRecord, setEditRecord] = useState(null);
-  const [deleteId, setDeleteId]   = useState(null);
-  const [deleting, setDeleting]   = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (!deleteId) return;
+
     setDeleting(true);
+
     try {
       await birthService.delete(deleteId);
       setDeleteId(null);
@@ -41,42 +99,97 @@ export default function Birth() {
   };
 
   const columns = [
-    { header: 'Reg. No.',       accessor: 'registration_no' },
-    { header: "Child's Name",   accessor: 'child_name' },
-    { header: 'Date of Birth',  accessor: 'date_of_birth' },
-    { header: "Father's Name",  accessor: 'father_name' },
-    { header: "Mother's Name",  accessor: 'mother_name' },
-    { header: 'Place of Birth', accessor: 'place_of_birth' },
+    {
+      header: 'Reg. No.',
+      accessor: 'registration_no',
+    },
+
+    {
+      header: "Child's Name",
+      accessor: 'child_name',
+    },
+
+    {
+      header: 'Date of Birth',
+      accessor: 'date_of_birth',
+    },
+
+    {
+      header: "Father's Name",
+      accessor: 'father_name',
+    },
+
+    {
+      header: "Mother's Name",
+      accessor: 'mother_name',
+    },
+
+    {
+      header: 'Place of Birth',
+      accessor: 'place_of_birth',
+    },
+
     {
       header: 'Status',
       key: 'status',
       render: (row) => (
-        <span className={`badge badge--${row.status === 'registered' ? 'green' : 'orange'}`}>
+        <span
+          className={`badge badge--${
+            row.status === 'registered'
+              ? 'green'
+              : 'orange'
+          }`}
+        >
           {row.status}
         </span>
       ),
     },
+
     {
       header: 'Actions',
       key: 'actions',
+
       render: (row) => (
         <div className="table-actions">
-          <button className="table-action-btn table-action-btn--view" title="View"
-            onClick={() => { setEditRecord(row); setShowForm(true); }}>
+
+          <button
+            className="table-action-btn table-action-btn--view"
+            title="View"
+            onClick={() => {
+              setEditRecord(row);
+              setShowForm(true);
+            }}
+          >
             <FiEye size={15} />
           </button>
-          <button className="table-action-btn table-action-btn--edit" title="Edit"
-            onClick={() => { setEditRecord(row); setShowForm(true); }}>
+
+          <button
+            className="table-action-btn table-action-btn--edit"
+            title="Edit"
+            onClick={() => {
+              setEditRecord(row);
+              setShowForm(true);
+            }}
+          >
             <FiEdit2 size={15} />
           </button>
-          <button className="table-action-btn table-action-btn--print" title="Print Certificate"
-            onClick={() => handlePrint(row.id)}>
+
+          <button
+            className="table-action-btn table-action-btn--print"
+            title="Print Certificate"
+            onClick={() => handlePrint(row.id)}
+          >
             <FiPrinter size={15} />
           </button>
-          <button className="table-action-btn table-action-btn--delete" title="Delete"
-            onClick={() => setDeleteId(row.id)}>
+
+          <button
+            className="table-action-btn table-action-btn--delete"
+            title="Delete"
+            onClick={() => setDeleteId(row.id)}
+          >
             <FiTrash2 size={15} />
           </button>
+
         </div>
       ),
     },
@@ -84,19 +197,32 @@ export default function Birth() {
 
   return (
     <div className="page">
+
       <div className="page__header">
         <div>
-          <h1 className="page__title">Birth Records</h1>
-          <p className="page__subtitle">Manage and view all birth registrations</p>
+          <h1 className="page__title">
+            Birth Records
+          </h1>
+
+          <p className="page__subtitle">
+            Manage and view all birth registrations
+          </p>
         </div>
-        <Button icon={FiPlus} onClick={() => { setEditRecord(null); setShowForm(true); }}>
+
+        <Button
+          icon={FiPlus}
+          onClick={() => {
+            setEditRecord(null);
+            setShowForm(true);
+          }}
+        >
           Register Birth
         </Button>
       </div>
 
       <DataTable
         columns={columns}
-        data={data?.records || []}
+        data={data?.records || mockData.records}
         loading={loading}
         searchable
         searchPlaceholder="Search birth records..."
@@ -106,20 +232,53 @@ export default function Birth() {
       {showForm && (
         <BirthForm
           record={editRecord}
-          onClose={() => { setShowForm(false); setEditRecord(null); }}
-          onSuccess={() => { setShowForm(false); setEditRecord(null); refetch(); }}
+          onClose={() => {
+            setShowForm(false);
+            setEditRecord(null);
+          }}
+          onSuccess={() => {
+            setShowForm(false);
+            setEditRecord(null);
+            refetch();
+          }}
         />
       )}
 
       {deleteId && (
         <div className="modal-overlay">
+
           <div className="modal modal--sm">
-            <h3 className="modal__title" style={{ padding: '20px 24px 0' }}>Confirm Delete</h3>
-            <p className="modal__text">Are you sure you want to delete this birth record?</p>
+
+            <h3
+              className="modal__title"
+              style={{ padding: '20px 24px 0' }}
+            >
+              Confirm Delete
+            </h3>
+
+            <p className="modal__text">
+              Are you sure you want to delete this birth record?
+            </p>
+
             <div className="modal__actions">
-              <Button variant="secondary" onClick={() => setDeleteId(null)}>Cancel</Button>
-              <Button variant="danger" loading={deleting} onClick={handleDelete}>Delete</Button>
+
+              <Button
+                variant="secondary"
+                onClick={() => setDeleteId(null)}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                variant="danger"
+                loading={deleting}
+                onClick={handleDelete}
+              >
+                Delete
+              </Button>
+
             </div>
+
           </div>
         </div>
       )}

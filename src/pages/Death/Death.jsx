@@ -12,15 +12,73 @@ import './Death.css';
 export default function Death() {
   usePageTitle('Death Records');
 
+  const mockData = {
+    records: [
+      {
+        id: 1,
+        registration_no: 'DR-2026-001',
+        deceased_name: 'Abebe Kebede',
+        date_of_death: '2026-05-10',
+        cause_of_death: 'Heart Attack',
+        place_of_death: 'Dessie Referral Hospital',
+        reported_by: 'Mekdes Abebe',
+        status: 'registered',
+      },
+      {
+        id: 2,
+        registration_no: 'DR-2026-002',
+        deceased_name: 'Tigist Alemu',
+        date_of_death: '2026-05-12',
+        cause_of_death: 'Accident',
+        place_of_death: 'Kombolcha',
+        reported_by: 'Samuel Tigabu',
+        status: 'pending',
+      },
+      {
+        id: 3,
+        registration_no: 'DR-2026-003',
+        deceased_name: 'Mohammed Hassan',
+        date_of_death: '2026-05-15',
+        cause_of_death: 'Illness',
+        place_of_death: 'Wollo Hospital',
+        reported_by: 'Ahmed Mohammed',
+        status: 'registered',
+      },
+      {
+        id: 4,
+        registration_no: 'DR-2026-004',
+        deceased_name: 'Selamawit Bekele',
+        date_of_death: '2026-05-18',
+        cause_of_death: 'Natural Causes',
+        place_of_death: 'Dessie',
+        reported_by: 'Yohannes Bekele',
+        status: 'registered',
+      },
+      {
+        id: 5,
+        registration_no: 'DR-2026-005',
+        deceased_name: 'Haile Tesfaye',
+        date_of_death: '2026-05-20',
+        cause_of_death: 'Stroke',
+        place_of_death: 'Boru Meda Hospital',
+        reported_by: 'Saron Haile',
+        status: 'pending',
+      },
+    ],
+  };
+
   const { data, loading, refetch } = useFetch(() => deathService.getAll());
-  const [showForm, setShowForm]     = useState(false);
+
+  const [showForm, setShowForm] = useState(false);
   const [editRecord, setEditRecord] = useState(null);
-  const [deleteId, setDeleteId]     = useState(null);
-  const [deleting, setDeleting]     = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (!deleteId) return;
+
     setDeleting(true);
+
     try {
       await deathService.delete(deleteId);
       setDeleteId(null);
@@ -48,51 +106,96 @@ export default function Death() {
     { header: 'Cause of Death', accessor: 'cause_of_death' },
     { header: 'Place of Death', accessor: 'place_of_death' },
     { header: 'Reported By', accessor: 'reported_by' },
+
     {
       header: 'Status',
       key: 'status',
       render: (row) => (
-        <span className={`badge badge--${row.status === 'registered' ? 'green' : 'orange'}`}>
+        <span
+          className={`badge badge--${
+            row.status === 'registered' ? 'green' : 'orange'
+          }`}
+        >
           {row.status}
         </span>
       ),
     },
+
     {
       header: 'Actions',
       key: 'actions',
       render: (row) => (
         <div className="table-actions">
-          <button className="table-action-btn table-action-btn--view" title="View" onClick={() => { setEditRecord(row); setShowForm(true); }}>
+
+          <button
+            className="table-action-btn table-action-btn--view"
+            title="View"
+            onClick={() => {
+              setEditRecord(row);
+              setShowForm(true);
+            }}
+          >
             <FiEye size={15} />
           </button>
-          <button className="table-action-btn table-action-btn--edit" title="Edit" onClick={() => { setEditRecord(row); setShowForm(true); }}>
-                <FiEdit2 size={15} />
-              </button>
-              <button className="table-action-btn table-action-btn--print" title="Print Certificate" onClick={() => handlePrint(row.id)}>
-                <FiPrinter size={15} />
-              </button>
-              <button className="table-action-btn table-action-btn--delete" title="Delete" onClick={() => setDeleteId(row.id)}>
-                <FiTrash2 size={15} />
-              </button>        </div>
+
+          <button
+            className="table-action-btn table-action-btn--edit"
+            title="Edit"
+            onClick={() => {
+              setEditRecord(row);
+              setShowForm(true);
+            }}
+          >
+            <FiEdit2 size={15} />
+          </button>
+
+          <button
+            className="table-action-btn table-action-btn--print"
+            title="Print Certificate"
+            onClick={() => handlePrint(row.id)}
+          >
+            <FiPrinter size={15} />
+          </button>
+
+          <button
+            className="table-action-btn table-action-btn--delete"
+            title="Delete"
+            onClick={() => setDeleteId(row.id)}
+          >
+            <FiTrash2 size={15} />
+          </button>
+
+        </div>
       ),
     },
   ];
 
   return (
     <div className="page">
+
       <div className="page__header">
         <div>
           <h1 className="page__title">Death Records</h1>
-          <p className="page__subtitle">Manage and view all death registrations</p>
+
+          <p className="page__subtitle">
+            Manage and view all death registrations
+          </p>
         </div>
-        <Button icon={FiPlus} onClick={() => { setEditRecord(null); setShowForm(true); }}>
-            Register Death
-          </Button>
+
+        <Button
+          icon={FiPlus}
+          onClick={() => {
+            setEditRecord(null);
+            setShowForm(true);
+          }}
+        >
+          Register Death
+        </Button>
       </div>
 
       <DataTable
         columns={columns}
-        data={data?.records || []}
+        data={data?.records || mockData.records}
         loading={loading}
         searchable
         searchPlaceholder="Search death records..."
@@ -102,21 +205,51 @@ export default function Death() {
       {showForm && (
         <DeathForm
           record={editRecord}
-          onClose={() => { setShowForm(false); setEditRecord(null); }}
-          onSuccess={() => { setShowForm(false); setEditRecord(null); refetch(); }}
+          onClose={() => {
+            setShowForm(false);
+            setEditRecord(null);
+          }}
+          onSuccess={() => {
+            setShowForm(false);
+            setEditRecord(null);
+            refetch();
+          }}
         />
       )}
 
       {deleteId && (
         <div className="modal-overlay">
           <div className="modal modal--sm">
-            <h3 className="modal__title" style={{ padding: '20px 24px 0' }}>Confirm Delete</h3>
+
+            <h3
+              className="modal__title"
+              style={{ padding: '20px 24px 0' }}
+            >
+              Confirm Delete
+            </h3>
+
             <p className="modal__text">
-              Are you sure you want to delete this death record? This action cannot be undone.
+              Are you sure you want to delete this death record?
+              This action cannot be undone.
             </p>
+
             <div className="modal__actions">
-              <Button variant="secondary" onClick={() => setDeleteId(null)}>Cancel</Button>
-              <Button variant="danger" loading={deleting} onClick={handleDelete}>Delete</Button>
+
+              <Button
+                variant="secondary"
+                onClick={() => setDeleteId(null)}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                variant="danger"
+                loading={deleting}
+                onClick={handleDelete}
+              >
+                Delete
+              </Button>
+
             </div>
           </div>
         </div>
