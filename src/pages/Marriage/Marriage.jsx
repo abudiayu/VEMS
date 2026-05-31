@@ -12,188 +12,51 @@ import './Marriage.css';
 export default function Marriage() {
   usePageTitle('Marriage Records');
 
-  const mockData = {
-    records: [
-      {
-        id: 1,
-        registration_no: 'MR-2026-001',
-        husband_name: 'Abebe Kebede',
-        wife_name: 'Selamawit Alemu',
-        marriage_date: '2026-05-10',
-        place_of_marriage: 'Dessie',
-        kebele: '03',
-        status: 'registered',
-      },
-      {
-        id: 2,
-        registration_no: 'MR-2026-002',
-        husband_name: 'Mohammed Ali',
-        wife_name: 'Hanan Yusuf',
-        marriage_date: '2026-05-12',
-        place_of_marriage: 'Kombolcha',
-        kebele: '05',
-        status: 'pending',
-      },
-      {
-        id: 3,
-        registration_no: 'MR-2026-003',
-        husband_name: 'Tesfaye Bekele',
-        wife_name: 'Marta Haile',
-        marriage_date: '2026-05-15',
-        place_of_marriage: 'Wollo',
-        kebele: '01',
-        status: 'registered',
-      },
-      {
-        id: 4,
-        registration_no: 'MR-2026-004',
-        husband_name: 'Ahmed Nur',
-        wife_name: 'Sofia Ali',
-        marriage_date: '2026-05-18',
-        place_of_marriage: 'Dessie',
-        kebele: '07',
-        status: 'registered',
-      },
-      {
-        id: 5,
-        registration_no: 'MR-2026-005',
-        husband_name: 'Getachew Tadesse',
-        wife_name: 'Betelhem Desta',
-        marriage_date: '2026-05-20',
-        place_of_marriage: 'Boru Meda',
-        kebele: '09',
-        status: 'pending',
-      },
-    ],
-  };
-
-  const { data, loading, refetch } = useFetch(() =>
-    marriageService.getAll()
-  );
-
-  const [showForm, setShowForm] = useState(false);
+  const { data, loading, refetch } = useFetch(() => marriageService.getAll());
+  const [showForm, setShowForm]     = useState(false);
   const [editRecord, setEditRecord] = useState(null);
-  const [deleteId, setDeleteId] = useState(null);
-  const [deleting, setDeleting] = useState(false);
+  const [deleteId, setDeleteId]     = useState(null);
+  const [deleting, setDeleting]     = useState(false);
 
   const handleDelete = async () => {
     if (!deleteId) return;
-
     setDeleting(true);
-
     try {
       await marriageService.delete(deleteId);
       setDeleteId(null);
       refetch();
-    } catch {
-      alert('Failed to delete record.');
-    } finally {
-      setDeleting(false);
-    }
+    } catch { alert('Failed to delete record.'); }
+    finally { setDeleting(false); }
   };
 
   const handlePrint = async (id) => {
     try {
       const res = await marriageService.generateCertificate(id);
-      window.open(res.certificate_url, '_blank');
-    } catch {
-      alert('Failed to generate certificate.');
-    }
+      window.open(res?.data?.certificate_url, '_blank');
+    } catch { alert('Failed to generate certificate.'); }
   };
 
   const columns = [
+    { header: 'Reg. No.',        accessor: 'registration_no' },
+    { header: "Husband's Name",  accessor: 'husband_name' },
+    { header: "Wife's Name",     accessor: 'wife_name' },
+    { header: 'Marriage Date',   accessor: 'marriage_date' },
+    { header: 'Place',           accessor: 'place_of_marriage' },
+    { header: 'Kebele',          accessor: 'kebele' },
     {
-      header: 'Reg. No.',
-      accessor: 'registration_no',
-    },
-
-    {
-      header: "Husband's Name",
-      accessor: 'husband_name',
-    },
-
-    {
-      header: "Wife's Name",
-      accessor: 'wife_name',
-    },
-
-    {
-      header: 'Marriage Date',
-      accessor: 'marriage_date',
-    },
-
-    {
-      header: 'Place',
-      accessor: 'place_of_marriage',
-    },
-
-    {
-      header: 'Kebele',
-      accessor: 'kebele',
-    },
-
-    {
-      header: 'Status',
-      key: 'status',
-
+      header: 'Status', key: 'status',
       render: (row) => (
-        <span
-          className={`badge badge--${
-            row.status === 'registered'
-              ? 'green'
-              : 'orange'
-          }`}
-        >
-          {row.status}
-        </span>
+        <span className={`badge badge--${row.status === 'registered' ? 'green' : 'orange'}`}>{row.status}</span>
       ),
     },
-
     {
-      header: 'Actions',
-      key: 'actions',
-
+      header: 'Actions', key: 'actions',
       render: (row) => (
         <div className="table-actions">
-
-          <button
-            className="table-action-btn table-action-btn--view"
-            title="View"
-            onClick={() => {
-              setEditRecord(row);
-              setShowForm(true);
-            }}
-          >
-            <FiEye size={15} />
-          </button>
-
-          <button
-            className="table-action-btn table-action-btn--edit"
-            title="Edit"
-            onClick={() => {
-              setEditRecord(row);
-              setShowForm(true);
-            }}
-          >
-            <FiEdit2 size={15} />
-          </button>
-
-          <button
-            className="table-action-btn table-action-btn--print"
-            title="Print Certificate"
-            onClick={() => handlePrint(row.id)}
-          >
-            <FiPrinter size={15} />
-          </button>
-
-          <button
-            className="table-action-btn table-action-btn--delete"
-            title="Delete"
-            onClick={() => setDeleteId(row.id)}
-          >
-            <FiTrash2 size={15} />
-          </button>
-
+          <button className="table-action-btn table-action-btn--view" title="View" onClick={() => { setEditRecord(row); setShowForm(true); }}><FiEye size={15} /></button>
+          <button className="table-action-btn table-action-btn--edit" title="Edit" onClick={() => { setEditRecord(row); setShowForm(true); }}><FiEdit2 size={15} /></button>
+          <button className="table-action-btn table-action-btn--print" title="Print" onClick={() => handlePrint(row.id)}><FiPrinter size={15} /></button>
+          <button className="table-action-btn table-action-btn--delete" title="Delete" onClick={() => setDeleteId(row.id)}><FiTrash2 size={15} /></button>
         </div>
       ),
     },
@@ -201,89 +64,31 @@ export default function Marriage() {
 
   return (
     <div className="page">
-
       <div className="page__header">
         <div>
-          <h1 className="page__title">
-            Marriage Records
-          </h1>
-
-          <p className="page__subtitle">
-            Manage and view all marriage registrations
-          </p>
+          <h1 className="page__title">Marriage Records</h1>
+          <p className="page__subtitle">Manage and view all marriage registrations</p>
         </div>
-
-        <Button
-          icon={FiPlus}
-          onClick={() => {
-            setEditRecord(null);
-            setShowForm(true);
-          }}
-        >
-          Register Marriage
-        </Button>
+        <Button icon={FiPlus} onClick={() => { setEditRecord(null); setShowForm(true); }}>Register Marriage</Button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={data?.records || mockData.records}
-        loading={loading}
-        searchable
-        searchPlaceholder="Search marriage records..."
-        emptyMessage="No marriage records found."
-      />
+      <DataTable columns={columns} data={data?.records || []} loading={loading} searchable searchPlaceholder="Search marriage records..." emptyMessage="No marriage records found." />
 
       {showForm && (
-        <MarriageForm
-          record={editRecord}
-          onClose={() => {
-            setShowForm(false);
-            setEditRecord(null);
-          }}
-          onSuccess={() => {
-            setShowForm(false);
-            setEditRecord(null);
-            refetch();
-          }}
-        />
+        <MarriageForm record={editRecord}
+          onClose={() => { setShowForm(false); setEditRecord(null); }}
+          onSuccess={() => { setShowForm(false); setEditRecord(null); refetch(); }} />
       )}
 
       {deleteId && (
         <div className="modal-overlay">
-
           <div className="modal modal--sm">
-
-            <h3
-              className="modal__title"
-              style={{ padding: '20px 24px 0' }}
-            >
-              Confirm Delete
-            </h3>
-
-            <p className="modal__text">
-              Are you sure you want to delete this marriage record?
-              This action cannot be undone.
-            </p>
-
+            <h3 className="modal__title" style={{ padding: '20px 24px 0' }}>Confirm Delete</h3>
+            <p className="modal__text">Are you sure you want to delete this marriage record? This cannot be undone.</p>
             <div className="modal__actions">
-
-              <Button
-                variant="secondary"
-                onClick={() => setDeleteId(null)}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                variant="danger"
-                loading={deleting}
-                onClick={handleDelete}
-              >
-                Delete
-              </Button>
-
+              <Button variant="secondary" onClick={() => setDeleteId(null)}>Cancel</Button>
+              <Button variant="danger" loading={deleting} onClick={handleDelete}>Delete</Button>
             </div>
-
           </div>
         </div>
       )}

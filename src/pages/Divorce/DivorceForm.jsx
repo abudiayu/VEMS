@@ -7,40 +7,33 @@ import '../../components/Forms/Forms.css';
 import '../Birth/Birth.css';
 
 const initialState = {
-  husband_name: '',
-  husband_id_no: '',
-  wife_name: '',
-  wife_id_no: '',
-  divorce_date: '',
-  court_order_no: '',
-  court_name: '',
-  reason: '',
-  kebele: '',
-  woreda: '',
-  notes: '',
+  husband_name: '', husband_id_no: '',
+  wife_name: '', wife_id_no: '',
+  divorce_date: '', court_order_no: '', court_name: '', reason: '',
+  kebele: '', woreda: '', notes: '',
 };
 
 export default function DivorceForm({ record, onClose, onSuccess }) {
   const isEdit = !!record;
-  const [form, setForm] = useState(record ? { ...record } : initialState);
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [form, setForm]           = useState(record ? { ...record } : initialState);
+  const [errors, setErrors]       = useState({});
+  const [loading, setLoading]     = useState(false);
   const [serverError, setServerError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: '' }));
+    setForm((p) => ({ ...p, [name]: value }));
+    setErrors((p) => ({ ...p, [name]: '' }));
   };
 
   const validate = () => {
-    const errs = {};
-    if (!form.husband_name.trim())  errs.husband_name  = "Husband's name is required.";
-    if (!form.wife_name.trim())     errs.wife_name     = "Wife's name is required.";
-    if (!form.divorce_date)         errs.divorce_date  = 'Divorce date is required.';
-    if (!form.court_order_no.trim()) errs.court_order_no = 'Court order number is required.';
-    if (!form.kebele.trim())        errs.kebele        = 'Kebele is required.';
-    return errs;
+    const e = {};
+    if (!form.husband_name.trim())   e.husband_name   = 'Required';
+    if (!form.wife_name.trim())      e.wife_name      = 'Required';
+    if (!form.divorce_date)          e.divorce_date   = 'Required';
+    if (!form.court_order_no.trim()) e.court_order_no = 'Required';
+    if (!form.kebele.trim())         e.kebele         = 'Required';
+    return e;
   };
 
   const handleSubmit = async (e) => {
@@ -57,7 +50,7 @@ export default function DivorceForm({ record, onClose, onSuccess }) {
       }
       onSuccess();
     } catch (err) {
-      setServerError(err.response?.data?.message || 'Failed to save record.');
+      setServerError(err?.response?.data?.message || err?.message || 'Failed to save. Try again.');
     } finally {
       setLoading(false);
     }
@@ -66,14 +59,12 @@ export default function DivorceForm({ record, onClose, onSuccess }) {
   return (
     <div className="modal-overlay">
       <div className="modal modal--lg">
-
         <div className="modal__header">
           <h3 className="modal__title">{isEdit ? 'Edit Divorce Record' : 'Register Divorce Event'}</h3>
           <button className="modal__close" onClick={onClose} aria-label="Close"><FiX size={20} /></button>
         </div>
 
         <form onSubmit={handleSubmit} noValidate className="modal__form">
-
           {serverError && <div className="form-error-banner">{serverError}</div>}
 
           <div className="modal__body">
@@ -115,7 +106,6 @@ export default function DivorceForm({ record, onClose, onSuccess }) {
               {isEdit ? 'Save Changes' : 'Save & Register'}
             </Button>
           </div>
-
         </form>
       </div>
     </div>

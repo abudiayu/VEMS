@@ -2,32 +2,21 @@ import api from './api';
 
 export const deathService = {
   getAll: async (params = {}) => {
-    const response = await api.get('/death/index.php', { params });
-    return response.data;
+    return await api.get('/death/index.php', { params });
   },
-
   getById: async (id) => {
-    const response = await api.get(`/death/show.php?id=${id}`);
-    return response.data;
+    return await api.get(`/death/show.php?id=${id}`);
   },
-
   create: async (data) => {
-    const response = await api.post('/death/create.php', data);
-    return response.data;
+    return await api.post('/death/create.php', data);
   },
-
   update: async (id, data) => {
-    const response = await api.put(`/death/update.php?id=${id}`, data);
-    return response.data;
+    return await api.put(`/death/update.php?id=${id}`, data);
   },
-
   delete: async (id) => {
-    const response = await api.delete(`/death/delete.php?id=${id}`);
-    return response.data;
+    return await api.delete(`/death/delete.php?id=${id}`);
   },
-
   generateCertificate: async (id) => {
-    const response = await api.get(`/death/certificate.php?id=${id}`);
-    return response.data;
+    return await api.get(`/death/certificate.php?id=${id}`);
   },
 };

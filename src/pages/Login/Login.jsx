@@ -1,365 +1,172 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import "./Login.css";
+import { FiUser, FiLock, FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi';
+import api from '../../services/api';
+import './Login.css';
 
-function Login() {
-  const [activeTab, setActiveTab] = useState('signin');
-  const [showPassword, setShowPassword] = useState(false);
-
-  const [signinData, setSigninData] = useState({
-    username: '',
-    password: '',
-  });
-
-  const [registerData, setRegisterData] = useState({
-    firstName: '',
-    fatherName: '',
-    email: '',
-    password: '',
-  });
-
+export default function Login() {
   const navigate = useNavigate();
 
-  const onlyLetters = (value) => /^[A-Za-z\s]*$/.test(value);
-  const onlyNumbers = (value) => /^[0-9]*$/.test(value);
+  const [form, setForm]         = useState({ username: '', password: '' });
+  const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
 
-  const handleSigninChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "username") {
-      if (!onlyLetters(value)) return;
-    }
-
-    setSigninData({
-      ...signinData,
-      [name]: value,
-    });
-
-    e.target.style.border = "";
+  const handleChange = (e) => {
+    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+    setError('');
   };
 
-  const handleRegisterChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "firstName" || name === "fatherName") {
-      if (!onlyLetters(value)) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.username || !form.password) {
+      setError('Please enter your username and password.');
+      return;
     }
-
-    if (name === "password") {
-      if (!onlyNumbers(value)) return;
-    }
-
-    setRegisterData({
-      ...registerData,
-      [name]: value,
-    });
-
-    e.target.style.border = "";
-  };
-
-  const handleSignin = () => {
-    let valid = true;
-
-    const usernameInput = document.querySelector('input[name="username"]');
-    const passwordInput = document.querySelector('.form-body--visible input[name="password"]');
-
-    if (signinData.username.trim() === '') {
-      usernameInput.style.border = "2px solid red";
-      valid = false;
-    } else {
-      usernameInput.style.border = "";
-    }
-
-    if (signinData.password.trim() === '') {
-      passwordInput.style.border = "2px solid red";
-      valid = false;
-    } else {
-      passwordInput.style.border = "";
-    }
-
-    if (valid) {
+    setLoading(true);
+    try {
+      const res = await api.post('/auth/login.php', form);
+      const token = res?.data?.token;
+      const user  = res?.data?.user;
+      if (!token) {
+        setError('Login failed. Please try again.');
+        return;
+      }
+      localStorage.setItem('vems_token', token);
+      localStorage.setItem('vems_user', JSON.stringify(user));
       navigate('/dashboard');
-    }
-  };
-
-  const handleRegister = () => {
-    let valid = true;
-
-    const firstNameInput = document.querySelector('input[name="firstName"]');
-    const fatherNameInput = document.querySelector('input[name="fatherName"]');
-    const emailInput = document.querySelector('input[name="email"]');
-    const passwordInput = document.querySelector('.form-body--visible input[name="password"]');
-
-    if (registerData.firstName.trim() === '') {
-      firstNameInput.style.border = "2px solid red";
-      valid = false;
-    } else {
-      firstNameInput.style.border = "";
-    }
-
-    if (registerData.fatherName.trim() === '') {
-      fatherNameInput.style.border = "2px solid red";
-      valid = false;
-    } else {
-      fatherNameInput.style.border = "";
-    }
-
-    if (registerData.email.trim() === '') {
-      emailInput.style.border = "2px solid red";
-      valid = false;
-    } else {
-      emailInput.style.border = "";
-    }
-
-    if (registerData.password.trim() === '') {
-      passwordInput.style.border = "2px solid red";
-      valid = false;
-    } else {
-      passwordInput.style.border = "";
-    }
-
-    if (valid) {
-      navigate('/dashboard');
+    } catch (err) {
+      setError(
+        err?.response?.data?.message ||
+        err?.message ||
+        'Invalid credentials. Please try again.'
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="login-root">
-      <div className="bg-grid" />
-      <div className="bg-glow" />
+    <div className="login-page">
+      <div className="login-page__left">
+        <div className="login-page__left-content">
 
-      <div className="login-card">
-        <div className="brand-panel">
-          <div className="brand-content">
-            <div className="brand-badge">VEMS. 2026</div>
+          <div className="login-page__logo">
+            <div className="login-page__logo-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2.2"
+                strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+            </div>
+            <div>
+              <h1 className="login-page__logo-title">VEMS</h1>
+              <p className="login-page__logo-sub">Ethiopia</p>
+            </div>
+          </div>
 
-            <h1 className="brand-title">
-              VEMS<span className="brand-dot">.</span>
-            </h1>
-
-            <p className="brand-sub">
-              Vital Management System for efficient record-keeping and streamlined operations in civil registration offices.
+          <div className="login-page__hero">
+            <h2 className="login-page__hero-title">
+              Vital Events<br />Management System
+            </h2>
+            <p className="login-page__hero-desc">
+              A centralized digital platform for registering and managing
+              birth, death, marriage, and divorce records across Ethiopia.
             </p>
-
-            <div className="brand-lines">
-              <span />
-              <span />
-              <span />
-            </div>
           </div>
 
-          <div className="brand-orb" />
-          <div className="brand-orb brand-orb--2" />
+          <div className="login-page__features">
+            {[
+              { icon: '👶', label: 'Birth Registration' },
+              { icon: '💍', label: 'Marriage Records' },
+              { icon: '📋', label: 'Death Registration' },
+              { icon: '⚖️', label: 'Divorce Records' },
+            ].map((f) => (
+              <div key={f.label} className="login-page__feature-item">
+                <span className="login-page__feature-icon">{f.icon}</span>
+                <span>{f.label}</span>
+              </div>
+            ))}
+          </div>
+
+          <p className="login-page__credit">
+            Wollo University — Kombolcha Institute of Technology
+          </p>
         </div>
+      </div>
 
-        <div className="form-panel">
-          <div className="tab-switcher">
-            <button
-              className={`tab-btn ${activeTab === 'signin' ? 'tab-btn--active' : ''}`}
-              onClick={() => setActiveTab('signin')}
-            >
-              Sign In
-            </button>
-
-            <button
-              className={`tab-btn ${activeTab === 'register' ? 'tab-btn--active' : ''}`}
-              onClick={() => setActiveTab('register')}
-            >
-              Register
-            </button>
-
-            <div
-              className={`tab-indicator ${activeTab === 'register' ? 'tab-indicator--right' : ''}`}
-            />
+      <div className="login-page__right">
+        <div className="login-card">
+          <div className="login-card__top">
+            <div className="login-card__avatar">
+              <FiUser size={26} />
+            </div>
+            <h2 className="login-card__title">Welcome back</h2>
+            <p className="login-card__subtitle">Sign in to your VEMS account</p>
           </div>
 
-          {/* SIGN IN */}
-          <div className={`form-body ${activeTab === 'signin' ? 'form-body--visible' : 'form-body--hidden'}`}>
-            <div className="form-header">
-              <h2>Welcome back</h2>
-              <p>Sign in to continue your session</p>
+          {error && (
+            <div className="login-card__error" role="alert">
+              <span>⚠</span> {error}
             </div>
+          )}
 
-            <div className="field-group">
-              <label className="field-label">Username</label>
-
-              <div className="field-wrap">
-                <span className="field-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                    <circle cx="12" cy="8" r="4" />
-                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-                  </svg>
-                </span>
-
+          <form className="login-card__form" onSubmit={handleSubmit} noValidate>
+            <div className="login-card__field">
+              <label className="login-card__label" htmlFor="username">Username</label>
+              <div className="login-card__input-wrap">
+                <FiUser size={16} className="login-card__input-icon" />
                 <input
-                  type="text"
-                  name="username"
-                  value={signinData.username}
-                  onChange={handleSigninChange}
-                  placeholder="your_username"
-                  className="field-input"
+                  id="username" name="username" type="text"
+                  autoComplete="username" value={form.username}
+                  onChange={handleChange} placeholder="Enter your username"
+                  className="login-card__input" autoFocus
                 />
               </div>
             </div>
 
-            <div className="field-group">
-              <label className="field-label">Password</label>
-
-              <div className="field-wrap">
-                <span className="field-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                    <rect x="5" y="11" width="14" height="10" rx="2" />
-                    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-                  </svg>
-                </span>
-
+            <div className="login-card__field">
+              <label className="login-card__label" htmlFor="password">Password</label>
+              <div className="login-card__input-wrap">
+                <FiLock size={16} className="login-card__input-icon" />
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={signinData.password}
-                  onChange={handleSigninChange}
-                  placeholder="Password"
-                  className="field-input"
+                  id="password" name="password"
+                  type={showPass ? 'text' : 'password'}
+                  autoComplete="current-password" value={form.password}
+                  onChange={handleChange} placeholder="Enter your password"
+                  className="login-card__input"
                 />
-
-                <button
-                  type="button"
-                  className="field-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? 'Hide' : 'Show'}
+                <button type="button" className="login-card__eye"
+                  onClick={() => setShowPass((v) => !v)}
+                  aria-label={showPass ? 'Hide password' : 'Show password'}>
+                  {showPass ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                 </button>
               </div>
             </div>
 
-            <div className="form-meta">
-              <label className="remember-label">
-                <input type="checkbox" className="remember-check" />
-                <span className="remember-custom" />
-                Remember me
-              </label>
-
-              <a href="#" className="forgot-link">
-                Forgot password?
-              </a>
-            </div>
-
-            <button
-              className="submit-btn"
-              onClick={handleSignin}
-            >
-              <span>Sign In</span>
-
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>
+            <button type="submit" className="login-card__btn" disabled={loading}>
+              {loading ? (
+                <span className="login-card__spinner" />
+              ) : (
+                <><span>Sign In</span><FiArrowRight size={17} /></>
+              )}
             </button>
+          </form>
 
-            <div className="divider">
-              <span>or continue with</span>
-            </div>
-
-            <div className="oauth-row">
-              <button className="oauth-btn">
-                Google
-              </button>
-
-              <button className="oauth-btn">
-                GitHub
-              </button>
-            </div>
+          <div className="login-card__hint">
+            <p>Default credentials:</p>
+            <code>admin / admin123</code>
           </div>
 
-          {/* REGISTER */}
-          <div className={`form-body ${activeTab === 'register' ? 'form-body--visible' : 'form-body--hidden'}`}>
-            <div className="form-header">
-              <h2>Create account</h2>
-              <p>Join and get full access instantly</p>
-            </div>
-
-            <div className="field-row">
-              <div className="field-group">
-                <label className="field-label">First Name</label>
-
-                <div className="field-wrap">
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={registerData.firstName}
-                    onChange={handleRegisterChange}
-                    placeholder="ABDUL"
-                    className="field-input field-input--bare"
-                  />
-                </div>
-              </div>
-
-              <div className="field-group">
-                <label className="field-label">Father Name</label>
-
-                <div className="field-wrap">
-                  <input
-                    type="text"
-                    name="fatherName"
-                    value={registerData.fatherName}
-                    onChange={handleRegisterChange}
-                    placeholder="KADIR"
-                    className="field-input field-input--bare"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="field-group">
-              <label className="field-label">Email</label>
-
-              <div className="field-wrap">
-                <input
-                  type="email"
-                  name="email"
-                  value={registerData.email}
-                  onChange={handleRegisterChange}
-                  placeholder="john@example.com"
-                  className="field-input"
-                />
-              </div>
-            </div>
-
-            <div className="field-group">
-              <label className="field-label">Password</label>
-
-              <div className="field-wrap">
-                <input
-                  type="password"
-                  name="password"
-                  value={registerData.password}
-                  onChange={handleRegisterChange}
-                  placeholder="Only Numbers"
-                  className="field-input"
-                />
-              </div>
-            </div>
-
-            <button
-              className="submit-btn"
-              onClick={handleRegister}
-            >
-              <span>Create Account</span>
-
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>
-            </button>
-
-            <p className="terms-note">
-              By registering, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
-            </p>
-          </div>
+          <p className="login-card__footer">
+            VEMS &copy; {new Date().getFullYear()} — Vital Events Management System
+          </p>
         </div>
       </div>
     </div>
   );
 }
-
-export default Login;

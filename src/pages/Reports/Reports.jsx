@@ -5,15 +5,15 @@ import FormField from '../../components/Forms/FormField';
 import DataTable from '../../components/Tables/DataTable';
 import { reportService } from '../../services/reportService';
 import { usePageTitle } from '../../hooks/usePageTitle';
-import './Reports.css';
 import '../Birth/Birth.css';
+import './Reports.css';
 
 const EVENT_TYPES = [
-  { value: 'birth', label: 'Birth' },
-  { value: 'death', label: 'Death' },
+  { value: 'all',      label: 'All Events' },
+  { value: 'birth',    label: 'Birth' },
+  { value: 'death',    label: 'Death' },
   { value: 'marriage', label: 'Marriage' },
-  { value: 'divorce', label: 'Divorce' },
-  { value: 'all', label: 'All Events' },
+  { value: 'divorce',  label: 'Divorce' },
 ];
 
 export default function Reports() {
@@ -28,20 +28,20 @@ export default function Reports() {
   });
 
   const [reportData, setReportData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [generated, setGenerated] = useState(false);
+  const [loading, setLoading]       = useState(false);
+  const [generated, setGenerated]   = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+    setFilters((p) => ({ ...p, [name]: value }));
   };
 
   const handleGenerate = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const data = await reportService.generate(filters);
-      setReportData(data);
+      const res = await reportService.generate(filters);
+      setReportData(res?.data || res);
       setGenerated(true);
     } catch {
       alert('Failed to generate report. Please try again.');
@@ -55,42 +55,33 @@ export default function Reports() {
     const rows = [
       ['Registration No.', 'Event Type', 'Name', 'Date', 'Kebele', 'Status'],
       ...(reportData.records || []).map((r) => [
-        r.registration_no,
-        r.event_type,
-        r.name,
-        r.date,
-        r.kebele,
-        r.status,
+        r.registration_no, r.event_type, r.name, r.date, r.kebele, r.status,
       ]),
     ];
-    const csv = rows.map((r) => r.join(',')).join('\n');
+    const csv  = rows.map((r) => r.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
     a.download = `vems-report-${Date.now()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   const columns = [
-    { header: 'Reg. No.', accessor: 'registration_no' },
+    { header: 'Reg. No.',    accessor: 'registration_no' },
     {
-      header: 'Event Type',
-      key: 'event_type',
+      header: 'Event Type', key: 'event_type',
       render: (row) => (
-        <span className={`badge badge--${row.event_type?.toLowerCase()}`}>
-          {row.event_type}
-        </span>
+        <span className={`badge badge--${row.event_type?.toLowerCase()}`}>{row.event_type}</span>
       ),
     },
-    { header: 'Name', accessor: 'name' },
-    { header: 'Date', accessor: 'date' },
+    { header: 'Name',   accessor: 'name' },
+    { header: 'Date',   accessor: 'date' },
     { header: 'Kebele', accessor: 'kebele' },
     { header: 'Woreda', accessor: 'woreda' },
     {
-      header: 'Status',
-      key: 'status',
+      header: 'Status', key: 'status',
       render: (row) => (
         <span className={`badge badge--${row.status === 'registered' ? 'green' : 'orange'}`}>
           {row.status}
@@ -120,42 +111,16 @@ export default function Reports() {
         </div>
         <form onSubmit={handleGenerate} noValidate>
           <div className="form-grid form-grid--3">
-            <FormField
-              label="Event Type"
-              name="event_type"
-              type="select"
-              value={filters.event_type}
-              onChange={handleChange}
-              options={EVENT_TYPES}
-            />
-            <FormField
-              label="Date From"
-              name="date_from"
-              type="date"
-              value={filters.date_from}
-              onChange={handleChange}
-            />
-            <FormField
-              label="Date To"
-              name="date_to"
-              type="date"
-              value={filters.date_to}
-              onChange={handleChange}
-            />
-            <FormField
-              label="Kebele"
-              name="kebele"
-              value={filters.kebele}
-              onChange={handleChange}
-              placeholder="Filter by kebele"
-            />
-            <FormField
-              label="Woreda"
-              name="woreda"
-              value={filters.woreda}
-              onChange={handleChange}
-              placeholder="Filter by woreda"
-            />
+            <FormField label="Event Type" name="event_type" type="select"
+              value={filters.event_type} onChange={handleChange} options={EVENT_TYPES} />
+            <FormField label="Date From" name="date_from" type="date"
+              value={filters.date_from} onChange={handleChange} />
+            <FormField label="Date To" name="date_to" type="date"
+              value={filters.date_to} onChange={handleChange} />
+            <FormField label="Kebele" name="kebele"
+              value={filters.kebele} onChange={handleChange} placeholder="Filter by kebele" />
+            <FormField label="Woreda" name="woreda"
+              value={filters.woreda} onChange={handleChange} placeholder="Filter by woreda" />
           </div>
           <div className="reports__filter-actions">
             <Button type="submit" icon={FiBarChart2} loading={loading}>

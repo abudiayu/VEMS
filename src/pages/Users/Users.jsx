@@ -1,237 +1,78 @@
 import { useState } from 'react';
-import {
-  FiPlus,
-  FiEdit2,
-  FiTrash2,
-  FiToggleLeft,
-  FiToggleRight
-} from 'react-icons/fi';
-
+import { FiPlus, FiEdit2, FiTrash2, FiToggleLeft, FiToggleRight } from 'react-icons/fi';
 import DataTable from '../../components/Tables/DataTable';
 import Button from '../../components/Forms/Button';
 import UserForm from './UserForm';
 import { userService } from '../../services/userService';
 import { useFetch } from '../../hooks/useFetch';
 import { usePageTitle } from '../../hooks/usePageTitle';
-
 import '../Birth/Birth.css';
 import './Users.css';
 
 export default function Users() {
-
   usePageTitle('User Management');
 
-  const mockUsers = {
-    users: [
-      {
-        id: 1,
-        username: 'admin01',
-        full_name: 'Abdul Kadir',
-        email: 'abdul@gmail.com',
-        role: 'admin',
-        status: 'active',
-        created_at: '2026-05-01',
-      },
-
-      {
-        id: 2,
-        username: 'employee01',
-        full_name: 'Mohammed Ali',
-        email: 'mohammed@gmail.com',
-        role: 'employee',
-        status: 'active',
-        created_at: '2026-05-03',
-      },
-
-      {
-        id: 3,
-        username: 'employee02',
-        full_name: 'Selamawit Desta',
-        email: 'selam@gmail.com',
-        role: 'employee',
-        status: 'inactive',
-        created_at: '2026-05-05',
-      },
-
-      {
-        id: 4,
-        username: 'customer01',
-        full_name: 'Ahmed Nur',
-        email: 'ahmed@gmail.com',
-        role: 'customer',
-        status: 'active',
-        created_at: '2026-05-08',
-      },
-
-      {
-        id: 5,
-        username: 'customer02',
-        full_name: 'Betelhem Tadesse',
-        email: 'betelhem@gmail.com',
-        role: 'customer',
-        status: 'inactive',
-        created_at: '2026-05-10',
-      },
-
-      {
-        id: 6,
-        username: 'admin02',
-        full_name: 'Hanan Yusuf',
-        email: 'hanan@gmail.com',
-        role: 'admin',
-        status: 'active',
-        created_at: '2026-05-12',
-      },
-    ],
-  };
-
-  const { data, loading, refetch } = useFetch(() =>
-    userService.getAll()
-  );
-
-  const [showForm, setShowForm] = useState(false);
+  const { data, loading, refetch } = useFetch(() => userService.getAll());
+  const [showForm, setShowForm]     = useState(false);
   const [editRecord, setEditRecord] = useState(null);
-  const [deleteId, setDeleteId] = useState(null);
-  const [deleting, setDeleting] = useState(false);
+  const [deleteId, setDeleteId]     = useState(null);
+  const [deleting, setDeleting]     = useState(false);
 
   const handleDelete = async () => {
     if (!deleteId) return;
-
     setDeleting(true);
-
     try {
       await userService.delete(deleteId);
       setDeleteId(null);
       refetch();
-    } catch {
-      alert('Failed to delete user.');
-    } finally {
-      setDeleting(false);
-    }
+    } catch { alert('Failed to delete user.'); }
+    finally { setDeleting(false); }
   };
 
-  const handleToggleStatus = async (id, currentStatus) => {
+  const handleToggle = async (id, currentStatus) => {
     try {
-      const newStatus =
-        currentStatus === 'active'
-          ? 'inactive'
-          : 'active';
-
+      const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
       await userService.toggleStatus(id, newStatus);
-
       refetch();
-    } catch {
-      alert('Failed to update user status.');
-    }
+    } catch { alert('Failed to update user status.'); }
   };
 
-  const getRoleBadge = (role) => {
-    const map = {
-      admin: 'badge--purple',
-      employee: 'badge--blue',
-      customer: 'badge--green',
-    };
-
+  const roleBadge = (role) => {
+    const map = { admin: 'badge--purple', employee: 'badge--blue', customer: 'badge--green' };
     return `badge ${map[role] || 'badge--gray'}`;
   };
 
   const columns = [
+    { header: 'Username',  accessor: 'username' },
+    { header: 'Full Name', accessor: 'full_name' },
+    { header: 'Email',     accessor: 'email' },
     {
-      header: 'Username',
-      accessor: 'username',
+      header: 'Role', key: 'role',
+      render: (row) => <span className={roleBadge(row.role)}>{row.role}</span>,
     },
-
     {
-      header: 'Full Name',
-      accessor: 'full_name',
-    },
-
-    {
-      header: 'Email',
-      accessor: 'email',
-    },
-
-    {
-      header: 'Role',
-      key: 'role',
-
+      header: 'Status', key: 'status',
       render: (row) => (
-        <span className={getRoleBadge(row.role)}>
-          {row.role}
-        </span>
-      ),
-    },
-
-    {
-      header: 'Status',
-      key: 'status',
-
-      render: (row) => (
-        <span
-          className={`badge badge--${
-            row.status === 'active'
-              ? 'green'
-              : 'red'
-          }`}
-        >
+        <span className={`badge badge--${row.status === 'active' ? 'green' : 'red'}`}>
           {row.status}
         </span>
       ),
     },
-
+    { header: 'Created', accessor: 'created_at' },
     {
-      header: 'Created',
-      accessor: 'created_at',
-    },
-
-    {
-      header: 'Actions',
-      key: 'actions',
-
+      header: 'Actions', key: 'actions',
       render: (row) => (
         <div className="table-actions">
-
+          <button className="table-action-btn table-action-btn--edit" title="Edit"
+            onClick={() => { setEditRecord(row); setShowForm(true); }}><FiEdit2 size={15} /></button>
           <button
-            className="table-action-btn table-action-btn--edit"
-            title="Edit"
-            onClick={() => {
-              setEditRecord(row);
-              setShowForm(true);
-            }}
-          >
-            <FiEdit2 size={15} />
+            className={`table-action-btn ${row.status === 'active' ? 'table-action-btn--print' : 'table-action-btn--view'}`}
+            title={row.status === 'active' ? 'Disable' : 'Enable'}
+            onClick={() => handleToggle(row.id, row.status)}>
+            {row.status === 'active' ? <FiToggleRight size={15} /> : <FiToggleLeft size={15} />}
           </button>
-
-          <button
-            className={`table-action-btn ${
-              row.status === 'active'
-                ? 'table-action-btn--print'
-                : 'table-action-btn--view'
-            }`}
-            title={
-              row.status === 'active'
-                ? 'Disable Account'
-                : 'Enable Account'
-            }
-            onClick={() =>
-              handleToggleStatus(row.id, row.status)
-            }
-          >
-            {row.status === 'active' ? (
-              <FiToggleRight size={15} />
-            ) : (
-              <FiToggleLeft size={15} />
-            )}
-          </button>
-
-          <button
-            className="table-action-btn table-action-btn--delete"
-            title="Delete"
-            onClick={() => setDeleteId(row.id)}
-          >
-            <FiTrash2 size={15} />
-          </button>
-
+          <button className="table-action-btn table-action-btn--delete" title="Delete"
+            onClick={() => setDeleteId(row.id)}><FiTrash2 size={15} /></button>
         </div>
       ),
     },
@@ -239,34 +80,19 @@ export default function Users() {
 
   return (
     <div className="page">
-
       <div className="page__header">
-
         <div>
-          <h1 className="page__title">
-            User Management
-          </h1>
-
-          <p className="page__subtitle">
-            Manage system accounts and access privileges
-          </p>
+          <h1 className="page__title">User Management</h1>
+          <p className="page__subtitle">Manage system accounts and access privileges</p>
         </div>
-
-        <Button
-          icon={FiPlus}
-          onClick={() => {
-            setEditRecord(null);
-            setShowForm(true);
-          }}
-        >
+        <Button icon={FiPlus} onClick={() => { setEditRecord(null); setShowForm(true); }}>
           Create Account
         </Button>
-
       </div>
 
       <DataTable
         columns={columns}
-        data={data?.users || mockUsers.users}
+        data={data?.users || []}
         loading={loading}
         searchable
         searchPlaceholder="Search users..."
@@ -276,59 +102,25 @@ export default function Users() {
       {showForm && (
         <UserForm
           record={editRecord}
-          onClose={() => {
-            setShowForm(false);
-            setEditRecord(null);
-          }}
-          onSuccess={() => {
-            setShowForm(false);
-            setEditRecord(null);
-            refetch();
-          }}
+          onClose={() => { setShowForm(false); setEditRecord(null); }}
+          onSuccess={() => { setShowForm(false); setEditRecord(null); refetch(); }}
         />
       )}
 
       {deleteId && (
         <div className="modal-overlay">
-
           <div className="modal modal--sm">
-
-            <h3
-              className="modal__title"
-              style={{ padding: '20px 24px 0' }}
-            >
-              Confirm Delete
-            </h3>
-
+            <h3 className="modal__title" style={{ padding: '20px 24px 0' }}>Confirm Delete</h3>
             <p className="modal__text">
-              Are you sure you want to delete this user
-              account? This action cannot be undone.
+              Are you sure you want to delete this user account? This cannot be undone.
             </p>
-
             <div className="modal__actions">
-
-              <Button
-                variant="secondary"
-                onClick={() => setDeleteId(null)}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                variant="danger"
-                loading={deleting}
-                onClick={handleDelete}
-              >
-                Delete
-              </Button>
-
+              <Button variant="secondary" onClick={() => setDeleteId(null)}>Cancel</Button>
+              <Button variant="danger" loading={deleting} onClick={handleDelete}>Delete</Button>
             </div>
-
           </div>
-
         </div>
       )}
-
     </div>
   );
 }

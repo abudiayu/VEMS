@@ -116,7 +116,11 @@ export default function Sidebar({ isOpen, onToggle }) {
         <div className="sidebar__logout-wrap">
           <button
             className={`sidebar__logout-btn ${isOpen ? 'sidebar__logout-btn--open' : ''}`}
-            onClick={() => navigate('/login')}
+            onClick={() => {
+              localStorage.removeItem('vems_user');
+              localStorage.removeItem('vems_token');
+              navigate('/login');
+            }}
             title="Logout"
           >
             <FiLogOut size={19} />

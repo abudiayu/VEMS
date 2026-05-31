@@ -7,40 +7,32 @@ import '../../components/Forms/Forms.css';
 import '../Birth/Birth.css';
 
 const initialState = {
-  deceased_name: '',
-  date_of_death: '',
-  place_of_death: '',
-  cause_of_death: '',
-  age_at_death: '',
-  gender: '',
-  reported_by: '',
-  reporter_id_no: '',
-  kebele: '',
-  woreda: '',
-  notes: '',
+  deceased_name: '', date_of_death: '', place_of_death: '',
+  cause_of_death: '', age_at_death: '', gender: '',
+  reported_by: '', reporter_id_no: '', kebele: '', woreda: '', notes: '',
 };
 
 export default function DeathForm({ record, onClose, onSuccess }) {
   const isEdit = !!record;
-  const [form, setForm] = useState(record ? { ...record } : initialState);
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [form, setForm]           = useState(record ? { ...record } : initialState);
+  const [errors, setErrors]       = useState({});
+  const [loading, setLoading]     = useState(false);
   const [serverError, setServerError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: '' }));
+    setForm((p) => ({ ...p, [name]: value }));
+    setErrors((p) => ({ ...p, [name]: '' }));
   };
 
   const validate = () => {
-    const errs = {};
-    if (!form.deceased_name.trim())  errs.deceased_name  = 'Deceased name is required.';
-    if (!form.date_of_death)         errs.date_of_death  = 'Date of death is required.';
-    if (!form.cause_of_death.trim()) errs.cause_of_death = 'Cause of death is required.';
-    if (!form.reported_by.trim())    errs.reported_by    = 'Reporter name is required.';
-    if (!form.kebele.trim())         errs.kebele         = 'Kebele is required.';
-    return errs;
+    const e = {};
+    if (!form.deceased_name.trim())  e.deceased_name  = 'Required';
+    if (!form.date_of_death)         e.date_of_death  = 'Required';
+    if (!form.cause_of_death.trim()) e.cause_of_death = 'Required';
+    if (!form.reported_by.trim())    e.reported_by    = 'Required';
+    if (!form.kebele.trim())         e.kebele         = 'Required';
+    return e;
   };
 
   const handleSubmit = async (e) => {
@@ -57,7 +49,7 @@ export default function DeathForm({ record, onClose, onSuccess }) {
       }
       onSuccess();
     } catch (err) {
-      setServerError(err.response?.data?.message || 'Failed to save record.');
+      setServerError(err?.response?.data?.message || err?.message || 'Failed to save. Try again.');
     } finally {
       setLoading(false);
     }
@@ -66,14 +58,12 @@ export default function DeathForm({ record, onClose, onSuccess }) {
   return (
     <div className="modal-overlay">
       <div className="modal modal--lg">
-
         <div className="modal__header">
           <h3 className="modal__title">{isEdit ? 'Edit Death Record' : 'Register Death Event'}</h3>
           <button className="modal__close" onClick={onClose} aria-label="Close"><FiX size={20} /></button>
         </div>
 
         <form onSubmit={handleSubmit} noValidate className="modal__form">
-
           {serverError && <div className="form-error-banner">{serverError}</div>}
 
           <div className="modal__body">
@@ -111,7 +101,6 @@ export default function DeathForm({ record, onClose, onSuccess }) {
               {isEdit ? 'Save Changes' : 'Save & Register'}
             </Button>
           </div>
-
         </form>
       </div>
     </div>

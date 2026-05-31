@@ -5,9 +5,9 @@
 }
 
 .settings__card {
-  background-color: var(--white);
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--gray-200);
+  background-color: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e8eaed;
   overflow: hidden;
 }
 
@@ -20,14 +20,14 @@
   align-items: center;
   gap: 10px;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--gray-200);
-  color: var(--gray-700);
+  border-bottom: 1px solid #e8eaed;
+  color: #5f6368;
 }
 
 .settings__card-title {
   font-size: 15px;
   font-weight: 600;
-  color: var(--gray-900);
+  color: #202124;
 }
 
 .settings__card-body {
@@ -38,8 +38,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--gray-100);
+  padding: 11px 0;
+  border-bottom: 1px solid #f1f3f4;
 }
 
 .settings__info-row:last-child {
@@ -49,29 +49,20 @@
 .settings__info-label {
   font-size: 13px;
   font-weight: 600;
-  color: var(--gray-500);
+  color: #9aa0a6;
 }
 
 .settings__info-value {
   font-size: 14px;
-  color: var(--gray-900);
+  color: #202124;
   font-weight: 500;
-}
-
-.settings__role-badge {
-  background-color: var(--primary-light);
-  color: var(--primary);
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
 }
 
 .settings__alert {
-  padding: 10px 14px;
-  border-radius: var(--border-radius);
+  padding: 11px 14px;
+  border-radius: 8px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 16px;
 }
 
@@ -82,8 +73,8 @@
 }
 
 .settings__alert--error {
-  background-color: var(--danger-light);
-  color: var(--danger);
+  background-color: #fce8e6;
+  color: #c62828;
   border: 1px solid #f5c6c3;
 }
 
@@ -108,15 +99,10 @@
 .settings__sys-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 
 @media (max-width: 768px) {
-  .settings__grid {
-    grid-template-columns: 1fr;
-  }
-
-  .settings__sys-grid {
-    grid-template-columns: 1fr;
-  }
+  .settings__grid    { grid-template-columns: 1fr; }
+  .settings__sys-grid { grid-template-columns: 1fr; }
 }

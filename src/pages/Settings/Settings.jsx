@@ -10,35 +10,33 @@ import './Settings.css';
 export default function Settings() {
   usePageTitle('Settings');
 
-  const user = { username: 'admin', role: 'admin', email: 'admin@vems.gov.et', full_name: 'System Administrator' };
+  const user = JSON.parse(localStorage.getItem('vems_user') || '{}');
 
   const [passwordForm, setPasswordForm] = useState({
-    current_password: '',
-    new_password: '',
-    confirm_password: '',
+    current_password: '', new_password: '', confirm_password: '',
   });
-  const [passwordErrors, setPasswordErrors] = useState({});
+  const [passwordErrors, setPasswordErrors]   = useState({});
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [passwordError, setPasswordError]     = useState('');
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
-    setPasswordForm((prev) => ({ ...prev, [name]: value }));
-    setPasswordErrors((prev) => ({ ...prev, [name]: '' }));
+    setPasswordForm((p) => ({ ...p, [name]: value }));
+    setPasswordErrors((p) => ({ ...p, [name]: '' }));
     setPasswordSuccess('');
     setPasswordError('');
   };
 
   const validatePassword = () => {
-    const errs = {};
-    if (!passwordForm.current_password) errs.current_password = 'Current password is required.';
-    if (!passwordForm.new_password) errs.new_password = 'New password is required.';
-    else if (passwordForm.new_password.length < 6) errs.new_password = 'Password must be at least 6 characters.';
+    const e = {};
+    if (!passwordForm.current_password)              e.current_password = 'Required';
+    if (!passwordForm.new_password)                  e.new_password     = 'Required';
+    else if (passwordForm.new_password.length < 6)   e.new_password     = 'Min 6 characters';
     if (passwordForm.new_password !== passwordForm.confirm_password) {
-      errs.confirm_password = 'Passwords do not match.';
+      e.confirm_password = 'Passwords do not match';
     }
-    return errs;
+    return e;
   };
 
   const handlePasswordSubmit = async (e) => {
@@ -52,11 +50,15 @@ export default function Settings() {
       setPasswordSuccess('Password changed successfully.');
       setPasswordForm({ current_password: '', new_password: '', confirm_password: '' });
     } catch (err) {
-      setPasswordError(err.response?.data?.message || 'Failed to change password.');
+      setPasswordError(err?.response?.data?.message || err?.message || 'Failed to change password.');
     } finally {
       setPasswordLoading(false);
     }
   };
+
+  const getRoleLabel = (role) => ({
+    admin: 'System Administrator', employee: 'Employee', customer: 'Customer',
+  }[role] || role);
 
   return (
     <div className="page">
@@ -74,26 +76,17 @@ export default function Settings() {
             <h2 className="settings__card-title">Account Information</h2>
           </div>
           <div className="settings__card-body">
-            <div className="settings__info-row">
-              <span className="settings__info-label">Username</span>
-              <span className="settings__info-value">{user?.username}</span>
-            </div>
-            <div className="settings__info-row">
-              <span className="settings__info-label">Role</span>
-              <span className="settings__info-value settings__role-badge">
-                {user?.role === 'admin' && 'System Administrator'}
-                {user?.role === 'employee' && 'Employee'}
-                {user?.role === 'customer' && 'Customer'}
-              </span>
-            </div>
-            <div className="settings__info-row">
-              <span className="settings__info-label">Email</span>
-              <span className="settings__info-value">{user?.email || '—'}</span>
-            </div>
-            <div className="settings__info-row">
-              <span className="settings__info-label">Full Name</span>
-              <span className="settings__info-value">{user?.full_name || '—'}</span>
-            </div>
+            {[
+              { label: 'Username',  value: user?.username },
+              { label: 'Full Name', value: user?.full_name },
+              { label: 'Email',     value: user?.email },
+              { label: 'Role',      value: getRoleLabel(user?.role) },
+            ].map((item) => (
+              <div key={item.label} className="settings__info-row">
+                <span className="settings__info-label">{item.label}</span>
+                <span className="settings__info-value">{item.value || '—'}</span>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -111,37 +104,15 @@ export default function Settings() {
             )}
             <form onSubmit={handlePasswordSubmit} noValidate>
               <div className="settings__form-fields">
-                <FormField
-                  label="Current Password"
-                  name="current_password"
-                  type="password"
-                  value={passwordForm.current_password}
-                  onChange={handlePasswordChange}
-                  error={passwordErrors.current_password}
-                  required
-                  placeholder="Enter current password"
-                />
-                <FormField
-                  label="New Password"
-                  name="new_password"
-                  type="password"
-                  value={passwordForm.new_password}
-                  onChange={handlePasswordChange}
-                  error={passwordErrors.new_password}
-                  required
-                  placeholder="Enter new password"
-                  hint="Minimum 6 characters"
-                />
-                <FormField
-                  label="Confirm New Password"
-                  name="confirm_password"
-                  type="password"
-                  value={passwordForm.confirm_password}
-                  onChange={handlePasswordChange}
-                  error={passwordErrors.confirm_password}
-                  required
-                  placeholder="Confirm new password"
-                />
+                <FormField label="Current Password" name="current_password" type="password"
+                  value={passwordForm.current_password} onChange={handlePasswordChange}
+                  error={passwordErrors.current_password} required placeholder="Enter current password" />
+                <FormField label="New Password" name="new_password" type="password"
+                  value={passwordForm.new_password} onChange={handlePasswordChange}
+                  error={passwordErrors.new_password} required placeholder="Enter new password" hint="Minimum 6 characters" />
+                <FormField label="Confirm New Password" name="confirm_password" type="password"
+                  value={passwordForm.confirm_password} onChange={handlePasswordChange}
+                  error={passwordErrors.confirm_password} required placeholder="Confirm new password" />
               </div>
               <div className="settings__form-actions">
                 <Button type="submit" icon={FiSave} loading={passwordLoading}>
@@ -158,22 +129,17 @@ export default function Settings() {
           </div>
           <div className="settings__card-body">
             <div className="settings__sys-grid">
-              <div className="settings__sys-item">
-                <span className="settings__info-label">System Name</span>
-                <span className="settings__info-value">Vital Events Management System</span>
-              </div>
-              <div className="settings__sys-item">
-                <span className="settings__info-label">Version</span>
-                <span className="settings__info-value">1.0.0</span>
-              </div>
-              <div className="settings__sys-item">
-                <span className="settings__info-label">Institution</span>
-                <span className="settings__info-value">Wollo University — KIoT</span>
-              </div>
-              <div className="settings__sys-item">
-                <span className="settings__info-label">Department</span>
-                <span className="settings__info-value">Computer Science</span>
-              </div>
+              {[
+                { label: 'System Name',  value: 'Vital Events Management System' },
+                { label: 'Version',      value: '1.0.0' },
+                { label: 'Institution',  value: 'Wollo University — KIoT' },
+                { label: 'Department',   value: 'Computer Science' },
+              ].map((item) => (
+                <div key={item.label} className="settings__sys-item">
+                  <span className="settings__info-label">{item.label}</span>
+                  <span className="settings__info-value">{item.value}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

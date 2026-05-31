@@ -2,32 +2,21 @@ import api from './api';
 
 export const marriageService = {
   getAll: async (params = {}) => {
-    const response = await api.get('/marriage/index.php', { params });
-    return response.data;
+    return await api.get('/marriage/index.php', { params });
   },
-
   getById: async (id) => {
-    const response = await api.get(`/marriage/show.php?id=${id}`);
-    return response.data;
+    return await api.get(`/marriage/show.php?id=${id}`);
   },
-
   create: async (data) => {
-    const response = await api.post('/marriage/create.php', data);
-    return response.data;
+    return await api.post('/marriage/create.php', data);
   },
-
   update: async (id, data) => {
-    const response = await api.put(`/marriage/update.php?id=${id}`, data);
-    return response.data;
+    return await api.put(`/marriage/update.php?id=${id}`, data);
   },
-
   delete: async (id) => {
-    const response = await api.delete(`/marriage/delete.php?id=${id}`);
-    return response.data;
+    return await api.delete(`/marriage/delete.php?id=${id}`);
   },
-
   generateCertificate: async (id) => {
-    const response = await api.get(`/marriage/certificate.php?id=${id}`);
-    return response.data;
+    return await api.get(`/marriage/certificate.php?id=${id}`);
   },
 };

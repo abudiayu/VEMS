@@ -7,46 +7,35 @@ import '../../components/Forms/Forms.css';
 import '../Birth/Birth.css';
 
 const initialState = {
-  husband_name: '',
-  husband_id_no: '',
-  husband_dob: '',
-  wife_name: '',
-  wife_id_no: '',
-  wife_dob: '',
-  marriage_date: '',
-  place_of_marriage: '',
-  marriage_type: '',
-  witness1_name: '',
-  witness2_name: '',
-  witness3_name: '',
-  witness4_name: '',
-  kebele: '',
-  woreda: '',
-  notes: '',
+  husband_name: '', husband_id_no: '', husband_dob: '',
+  wife_name: '', wife_id_no: '', wife_dob: '',
+  marriage_date: '', place_of_marriage: '', marriage_type: '',
+  witness1_name: '', witness2_name: '', witness3_name: '', witness4_name: '',
+  kebele: '', woreda: '', notes: '',
 };
 
 export default function MarriageForm({ record, onClose, onSuccess }) {
   const isEdit = !!record;
-  const [form, setForm] = useState(record ? { ...record } : initialState);
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [form, setForm]           = useState(record ? { ...record } : initialState);
+  const [errors, setErrors]       = useState({});
+  const [loading, setLoading]     = useState(false);
   const [serverError, setServerError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: '' }));
+    setForm((p) => ({ ...p, [name]: value }));
+    setErrors((p) => ({ ...p, [name]: '' }));
   };
 
   const validate = () => {
-    const errs = {};
-    if (!form.husband_name.trim())  errs.husband_name  = "Husband's name is required.";
-    if (!form.wife_name.trim())     errs.wife_name     = "Wife's name is required.";
-    if (!form.marriage_date)        errs.marriage_date = 'Marriage date is required.';
-    if (!form.witness1_name.trim()) errs.witness1_name = 'Witness 1 is required.';
-    if (!form.witness2_name.trim()) errs.witness2_name = 'Witness 2 is required.';
-    if (!form.kebele.trim())        errs.kebele        = 'Kebele is required.';
-    return errs;
+    const e = {};
+    if (!form.husband_name.trim())  e.husband_name  = 'Required';
+    if (!form.wife_name.trim())     e.wife_name     = 'Required';
+    if (!form.marriage_date)        e.marriage_date = 'Required';
+    if (!form.witness1_name.trim()) e.witness1_name = 'Required';
+    if (!form.witness2_name.trim()) e.witness2_name = 'Required';
+    if (!form.kebele.trim())        e.kebele        = 'Required';
+    return e;
   };
 
   const handleSubmit = async (e) => {
@@ -63,7 +52,7 @@ export default function MarriageForm({ record, onClose, onSuccess }) {
       }
       onSuccess();
     } catch (err) {
-      setServerError(err.response?.data?.message || 'Failed to save record.');
+      setServerError(err?.response?.data?.message || err?.message || 'Failed to save. Try again.');
     } finally {
       setLoading(false);
     }
@@ -72,14 +61,12 @@ export default function MarriageForm({ record, onClose, onSuccess }) {
   return (
     <div className="modal-overlay">
       <div className="modal modal--lg">
-
         <div className="modal__header">
           <h3 className="modal__title">{isEdit ? 'Edit Marriage Record' : 'Register Marriage Event'}</h3>
           <button className="modal__close" onClick={onClose} aria-label="Close"><FiX size={20} /></button>
         </div>
 
         <form onSubmit={handleSubmit} noValidate className="modal__form">
-
           {serverError && <div className="form-error-banner">{serverError}</div>}
 
           <div className="modal__body">
@@ -138,7 +125,6 @@ export default function MarriageForm({ record, onClose, onSuccess }) {
               {isEdit ? 'Save Changes' : 'Save & Register'}
             </Button>
           </div>
-
         </form>
       </div>
     </div>

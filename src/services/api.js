@@ -1,9 +1,6 @@
 import axios from 'axios';
 
-// Local: http://localhost:8888/vems-backend/api  (MAMP port 8888)
-// Local: http://localhost/vems-backend/api       (MAMP port 80)
-// Production: set VITE_API_URL in .env file
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8888/vems-backend/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -24,7 +21,9 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response.data;
+  },
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('vems_user');
